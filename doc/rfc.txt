@@ -1,0 +1,364 @@
+Network Protcol                                                         Mounia Arjdal
+Request for comments                                             Séphorah Aniambossou
+MyTeams                                                                    April 2024
+                                MYTEAMS PROTOCOL
+
+
+Table of Contents
+
+   1. Introduction ....................................................1
+   2. Commands ........................................................1
+      2.1. /create ....................................................2
+      2.2. /list ......................................................3
+      2.3. /info ......................................................3
+   3. Status code .....................................................4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Network Protcol                                                         Mounia Arjdal
+Request for comments                                             Séphorah Aniambossou
+MyTeams                                                                    April 2024
+                                                                             [Page 1]
+                                MYTEAMS PROTOCOL
+
+
+
+1       Introduction
+
+This RFC describes the protocol used to implement MyTeams.
+The network communication is achieved through the use of TCP sockets.
+
+
+2       Commands
+
+Here are the commands from client to server:
+
+        /help <LF>                      :       show help
+
+        /login ["user_name"] <LF>       :       set the user_name used by
+                                           client
+
+        /logout <LF>                    :       disconnect the client
+                                           from the server
+
+        /users  <LF>                    :       get the list of all users
+                                           that exist on the domain
+
+        /user ["user_uuid"] <LF>        :       get details about the
+                                           requested user
+
+        /send ["user_uuid"]
+        ["message_body"] <LF>           :       send a message to specific user
+
+        /messages ["user_uuid"] <LF>    :       list all messages exchanged
+                                           with the specified user
+
+        /subscribe ["team_uuid"] <LF>   :       subscribe to the events of a team
+                                           and its sub directories
+                                           (enable reception of all events
+                                           from a team)
+
+
+
+
+Network Protcol                                                         Mounia Arjdal
+Request for comments                                             Séphorah Aniambossou
+MyTeams                                                                    April 2024
+                                                                             [Page 2]
+                                MYTEAMS PROTOCOL
+
+
+
+        /subscribed ?["team_uuid"] <LF> :       list all subscribed teams or list
+                                           all users subscribed to a team
+
+        /unsubscribe ["team_uuid"] <LF> :       unsubscribe from a team
+
+        /use ?["team_uuid"]
+            ?["channel_uuid"]
+            ?["thread_uuid"] <LF>       :       Sets the command context to
+                                           a team/channel/thread
+
+        /create <LF>                    :       based on the context, create the
+                                           sub resource (see below)
+
+        /list <LF>                      :       based on the context, list all the
+                                           sub resources (see below)
+
+        /info <LF>                      :       based on the context, display details
+                                           of the current resource (see below)
+
+Commands must be terminated by a linefeed <LF>.
+
+        2.1     /create
+
+When the context is not defined (/use):
+        /create ["team_name"]
+        ["team_description"]        : create a new team
+
+When team_uuid is defined (/use "team_uuid"):
+        /create ["channel_name"]
+        ["channel_description"]     : create a new channel
+
+When team_uuid and channel_uuid are defined (/use "team_uuid" "channel_uuid"):
+        /create ["thread_title"]
+        ["thread_message"]          : create a new thread
+
+
+
+
+Network Protcol                                                         Mounia Arjdal
+Request for comments                                             Séphorah Aniambossou
+MyTeams                                                                    April 2024
+                                                                             [Page 3]
+                                MYTEAMS PROTOCOL
+
+
+
+When team_uuid, channel_uuid and thread_uuid are defined (/use "team_uuid"
+"channel_uuid" "thread_uuid"):
+        /create ["comment_body"]    : create a new reply
+
+
+        2.2     /list
+
+When the context is not defined (/use):
+        /list   :   list all existing teams
+
+When team_uuid is defined (/use "team_uuid"):
+        /list   :   list all existing channels
+
+When team_uuid and channel_uuid are defined (/use "team_uuid" "channel_uuid"):
+        /list   :   list all existing threads
+
+When team_uuid, channel_uuid and thread_uuid are defined 
+    (/use "team_uuid" "channel_uuid" "thread_uuid"):
+        /list   :   list all existing replies
+
+        2.2     /info
+
+When the context is not defined (/use):
+            /info   :   display currently logged-in user details
+
+When team_uuid is defined (/use "team_uuid"):
+            /info   :   display currently selected team details
+
+When team_uuid and channel_uuid are defined (/use "team_uuid" "channel_uuid"):
+            /info   :   display currently selected channel details
+            
+When team_uuid, channel_uuid and thread_uuid are defined (/use "team_uuid"
+"channel_uuid" "thread_uuid"):
+            /info   :   display currently selected thread details
+
+
+
+
+Network Protcol                                                         Mounia Arjdal
+Request for comments                                             Séphorah Aniambossou
+MyTeams                                                                    April 2024
+                                                                             [Page 4]
+                                MYTEAMS PROTOCOL
+
+
+
+3   Status codes
+
+        Code                Meaning
+
+        200                 Command okay
+        201                 Successful login
+        202                 Created user with given username
+        203                 User logged in
+        211                 Received a message
+        212                 Sent message to specific user
+        220                 Service ready for new user
+        221                 Successful logout
+        222                 User logged out
+        230                 Show list of all existing users
+        231                 Show details about requested user
+        232                 List messages exchanged with requested user
+        234                 Show help message
+        235                 List all subscribed teams of a user
+        237                 List all users subscribed to a team
+        242                 Subscribe to a team successfully
+        243                 Unsubscribe from a team successfully
+        270                 Created a new team
+        271                 Created a new channel
+        272                 Created a new thread
+        273                 Created a new reply
+        280                 List all existing teams
+        281                 List all existing channels
+        282                 List all existing threads
+        283                 List all existing replies
+        284                 Display currently logged-in user details
+        285                 Display currently selected team details
+        286                 Display currently selected channel details
+        287                 Display currently selected thread details
+        301                 Context set
+        400                 Invalid arguments
+        401                 User not found
+        402                 Team not found
+        403                 Thread not found
+
+
+
+
+Network Protcol                                                         Mounia Arjdal
+Request for comments                                             Séphorah Aniambossou
+MyTeams                                                                    April 2024
+                                                                             [Page 5]
+                                MYTEAMS PROTOCOL
+
+
+
+        404                 Channel not found
+        410                 Resource (team, user, channel, thread) already exists
+        411                 User is already connected
+        420                 Too long name
+        421                 Too long description
+        422                 Too long body
+        430                 Please login with /login
+        500                 An internal error occured
+        502                 Unknown command
+
+
+The server reply is defined by a 3-digit status code followed by a linefeed <LF>.
+
+
+        User                Server       Comments
+                    ==>                  Upon connection
+                    <==     220
+
+        /help       ==> 
+                    <==     234
+
+        /login      ==>
+                    <==     201
+                    <==     202
+                    <==     203
+                    <==     411
+
+
+        /logout     ==>
+                    <==     221
+                    <==     222
+
+        /users      ==>
+                    <==     230
+ 
+        /user       ==>
+                    <==     231
+                    <==     401
+
+        /send       ==>
+                    <==     212
+                    <==     211
+                    <==     401
+                    <==     422
+
+
+
+
+
+Network Protcol                                                         Mounia Arjdal
+Request for comments                                             Séphorah Aniambossou
+MyTeams                                                                    April 2024
+                                                                             [Page 6]
+                                MYTEAMS PROTOCOL
+
+
+
+        /messages   ==>
+                    <==     232
+                    <==     401
+
+        /subscribe  ==>
+                    <==     242
+                    <==     402
+
+        /subscribed ==>
+                    <==     235
+                    <==     237
+                    <==     402
+        
+        /unsubscribe ==>
+                     <==    243
+                     <==    402
+        
+        /use        ==>
+                    <==     301
+                    <==     401
+                    <==     402
+                    <==     403
+
+        /create     ==>
+                    <==     270
+                    <==     271
+                    <==     272
+                    <==     273
+                    <==     410
+                    <==     420
+                    <==     421
+                    <==     422
+
+        /list       ==>
+                    <==     280
+                    <==     281
+                    <==     282
+                    <==     283
+
+
+
+Network Protcol                                                         Mounia Arjdal
+Request for comments                                             Séphorah Aniambossou
+MyTeams                                                                    April 2024
+                                                                             [Page 7]
+                                MYTEAMS PROTOCOL
+
+
+
+                    <==     402
+                    <==     403
+                    <==     404
+
+        /info       ==>
+                    <==     284
+                    <==     285
+                    <==     286
+                    <==     287
+                    <==     402
+                    <==     403
+                    <==     404
+                    
+
+                    <==     502
+
